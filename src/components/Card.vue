@@ -20,6 +20,7 @@
         round
         :icon="priorityIcon[todo.priority - 1]"
         @click="prompt('priority')"
+        style="margin-left: auto;"
       />
     </q-card-actions>
   </q-card>
@@ -83,7 +84,6 @@ export default defineComponent({
           persistent: true,
         })
           .onOk((data) => {
-            console.log(data);
             if (data) {
               const todo = boardStore.lists
                 .find((list) => list.id == props.listId)
@@ -106,7 +106,10 @@ export default defineComponent({
 
 <style>
 .my-card {
-  width: 220px;
+  width: 90%;
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .title {
   word-wrap: break-word;

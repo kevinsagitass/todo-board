@@ -42,7 +42,7 @@ export default defineComponent({
       let list = boardStore.lists.find((list) => list.id == props.listId);
 
       list.items.push({
-        id: list.items.length,
+        id: boardStore.todoId++,
         name: input.value,
         status: 'todo',
         dueDate: '1-Aug-2022',

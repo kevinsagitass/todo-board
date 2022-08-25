@@ -63,11 +63,30 @@ export const useBoardStore = defineStore('board', {
         ],
       },
     ],
-    todoId: 6
+    todoId: 6,
+    status: '',
+    priority: 0,
   }),
-  actions: {
-    getLists() {
-      return this.lists;
+  getters: {
+    getLists: (state) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let filterLists = JSON.parse(JSON.stringify(state.lists));
+
+      if (state.status != '') {
+        filterLists = JSON.parse(JSON.stringify(state.lists.filter((list) => list.title == state.status)));
+      }
+
+      if (state.priority != 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        filterLists.forEach((list: any) => {
+          list.items = list.items.filter(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (item: any) => item.priority == state.priority
+          );
+        });
+      }
+
+      return filterLists;
     },
   },
 });

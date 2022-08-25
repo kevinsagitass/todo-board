@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div class="board-container">
+  <div class="board-container" style="width: 100%;">
     <div class="board">
       <div class="lists-container">
         <div
@@ -8,7 +8,7 @@
           @dragover.prevent
           @dragenter.prevent
           @drop="onDrop($event, list)"
-          v-for="list in boardStore.lists"
+          v-for="list in boardStore.getLists"
           :key="list.id"
         >
           <section class="list-container" ref="list" :data-id="list.id">
@@ -35,7 +35,6 @@
                 :list-id="list.id"
                 placeholder="Add a todo"
                 icon="publish"
-                @enter="onAddItem"
               />
             </div>
           </section>
@@ -50,93 +49,13 @@ import { defineComponent } from 'vue';
 import Card from './Card.vue';
 import { useBoardStore } from '../stores/board-store';
 import TodoInput from './TodoInput.vue';
-import { makeDropHandler } from 'src/util/plugins';
+
+const boardStore = useBoardStore();
 
 export default defineComponent({
   components: {
     Card,
     TodoInput,
-  },
-  methods: {
-    onAddList({ text }) {
-      this.$store.commit('addList', { title: text });
-      this.$nextTick(() => {
-        const lists = this.$refs.list;
-        lists[lists.length - 1].querySelector('input').focus();
-      });
-    },
-
-    onAddItem({ id, text, more }) {
-      if (more) {
-        this.activeListId = id;
-        this.modal = true;
-        this.showModal({ title: text });
-        return;
-      }
-      this.addItem(id, text);
-    },
-
-    onAddFullItem(item) {
-      item.id
-        ? this.$store.commit('updateItem', { itemId: item.id, ...item })
-        : this.addItem(
-            this.activeListId,
-            item.title,
-            item.description,
-            item.date
-          );
-      this.hideModal();
-    },
-
-    addItem(listId, title, description, date) {
-      this.$store.commit('addItem', { listId, title, description, date });
-    },
-
-    editItem(item) {
-      this.showModal(item);
-    },
-
-    onListDrop: makeDropHandler('onListDropComplete'),
-
-    onListDropComplete: function (src, trg) {
-      this.$store.commit('moveList', [src.index, trg.index]);
-    },
-
-    onCardDrop: makeDropHandler('onCardDropComplete'),
-
-    onCardDropComplete(src, trg) {
-      this.$store.commit('moveItem', [
-        src.params[1],
-        src.index,
-        trg.params[1],
-        trg.index,
-      ]);
-    },
-
-    showModal(item) {
-      this.modal = true;
-      this.$nextTick(() => {
-        this.$refs.form.show(item);
-      });
-    },
-
-    hideModal() {
-      this.focusInput(this.activeListId);
-      this.modal = false;
-    },
-
-    focusInput(listId) {
-      const index = this.lists.findIndex((list) => list.id === listId);
-      if (index > -1) {
-        this.$refs.list[index].querySelector('input').focus();
-      }
-    },
-
-    reset() {
-      if (confirm('Are you sure you want to reset the board?')) {
-        this.$store.commit('reset');
-      }
-    },
   },
   methods: {
     startDrag(evt, item) {
@@ -166,7 +85,6 @@ export default defineComponent({
     },
   },
   setup() {
-    const boardStore = useBoardStore();
 
     return {
       boardStore,
@@ -182,8 +100,11 @@ export default defineComponent({
   padding: 15px;
   vertical-align: top;
   display: inline-block;
+  width: 25%;
   max-height: 100%;
   overflow-y: scroll;
+  height: fit-content;
+  width: 20%;
 }
 .drag-el {
   background-color: #fff;
@@ -192,5 +113,7 @@ export default defineComponent({
 }
 .lists-container {
   height: 90vh;
+  display: flex;
+  justify-content: center;
 }
 </style>
