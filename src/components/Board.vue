@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div class="board-container" style="width: 100%;">
+  <div class="board-container" style="width: 100%">
     <div class="board">
       <div class="lists-container">
         <div
@@ -27,6 +27,7 @@
               v-for="item in list.items"
               :key="item.id"
               :draggable="true"
+              @click.right="onRightClick($event, list.id, item.id)"
               @dragstart="startDrag($event, item)"
             />
 
@@ -69,7 +70,7 @@ export default defineComponent({
         (list) => list.items.filter((item) => item.id == itemID).length != 0
       );
       let moveItem = null;
-      this.boardStore.lists.forEach((list) => {
+      boardStore.lists.forEach((list) => {
         list.items.forEach((item) => {
           if (item.id == itemID) {
             moveItem = item;
@@ -77,7 +78,7 @@ export default defineComponent({
         });
       });
       if (previousList.id != list.id) {
-        list.items.push(moveItem);
+        boardStore.lists.find((x) => x.id == list.id).items.push(moveItem);
         previousList.items = previousList.items.filter(
           (item) => item.id != itemID
         );
@@ -85,9 +86,19 @@ export default defineComponent({
     },
   },
   setup() {
+    const onRightClick = (evt, listId, itemId) => {
+      evt.preventDefault();
+
+      const list = boardStore.lists.find((list) => list.id == listId);
+
+      if (list) {
+        list.items = list.items.filter((item) => item.id != itemId);
+      }
+    };
 
     return {
       boardStore,
+      onRightClick,
     };
   },
 });
